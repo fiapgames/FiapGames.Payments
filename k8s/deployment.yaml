@@ -1,28 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: payments-worker
+  name: payments-api
   namespace: fiapgames
   labels:
-    app: payments-worker
+    app: payments-api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: payments-worker
+      app: payments-api
   template:
     metadata:
       labels:
-        app: payments-worker
+        app: payments-api
     spec:
       containers:
-        - name: payments-worker
-          image: lucasceifador/fiapgames-payments-worker:latest
+        - name: payments-api
+          image: lucasceifador/fiapgames-payments-api:latest
+          ports:
+            - containerPort: 8080
           envFrom:
             - configMapRef:
-                name: payments-worker-config
+                name: payments-api-config
             - secretRef:
-                name: payments-worker-secrets
+                name: payments-api-secrets
           resources:
             requests:
               cpu: "100m"

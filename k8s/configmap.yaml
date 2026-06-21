@@ -1,14 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: payments-worker-config
+  name: payments-api-config
   namespace: fiapgames
   labels:
-    app: payments-worker
+    app: payments-api
 data:
-  RabbitMq__HostName: "rabbitmq.fiapgames.svc.cluster.local"
-  RabbitMq__Port: "5672"
+  RabbitMq__Host: "rabbitmq.fiapgames.svc.cluster.local"
   RabbitMq__VirtualHost: "/"
-  RabbitMq__OrderPlacedQueue: "order-placed-queue"
-  RabbitMq__PaymentProcessedCatalogQueue: "payment-processed-catalog-queue"
-  RabbitMq__PaymentProcessedNotificationsQueue: "payment-processed-notifications-queue"
