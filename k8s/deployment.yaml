@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-worker
+  namespace: fiapgames
+  labels:
+    app: payments-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-worker
+  template:
+    metadata:
+      labels:
+        app: payments-worker
+    spec:
+      containers:
+        - name: payments-worker
+          image: lucasceifador/fiapgames-payments-worker:latest
+          envFrom:
+            - configMapRef:
+                name: payments-worker-config
+            - secretRef:
+                name: payments-worker-secrets
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"

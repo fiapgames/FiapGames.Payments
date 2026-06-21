@@ -1,0 +1,38 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: fiapgames-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: fiapgames-admin
+      RABBITMQ_DEFAULT_PASS: FiapGames@Admin123
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  payments-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fiapgames-payments
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      RabbitMq__HostName: rabbitmq
+      RabbitMq__Port: "5672"
+      RabbitMq__VirtualHost: "/"
+      RabbitMq__UserName: fiapgames-admin
+      RabbitMq__Password: FiapGames@Admin123
+      RabbitMq__OrderPlacedQueue: order-placed-queue
+      RabbitMq__PaymentProcessedCatalogQueue: payment-processed-catalog-queue
+      RabbitMq__PaymentProcessedNotificationsQueue: payment-processed-notifications-queue
+
+volumes:
+  rabbitmq-data:

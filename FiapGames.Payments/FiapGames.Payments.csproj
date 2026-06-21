@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>fiapgames-payments</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FiapGames.Contracts" Version="1.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9"/>
+        <PackageReference Include="RabbitMQ.Client" Version="7.1.2"/>
+    </ItemGroup>
+
+</Project>
