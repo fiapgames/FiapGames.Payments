@@ -15,6 +15,17 @@ spec:
       labels:
         app: payments-api
     spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z -w 2 postgres.fiapgames.svc.cluster.local 5432; do
+                echo "waiting for postgres..."
+                sleep 2
+              done
       containers:
         - name: payments-api
           image: lucasceifador/fiapgames-payments-api:latest
