@@ -14,6 +14,19 @@ builder.Services.AddDbContext<PaymentsDbContext>(options =>
 
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 
+// Notificações agora são servidas pela Azure Function serverless, via HTTP.
+builder.Services.AddHttpClient<INotificationsClient, NotificationsClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["Notifications:BaseUrl"]!.TrimEnd('/') + "/");
+    client.Timeout = TimeSpan.FromSeconds(10);
+
+    var functionKey = builder.Configuration["Notifications:FunctionKey"];
+    if (!string.IsNullOrWhiteSpace(functionKey))
+    {
+        client.DefaultRequestHeaders.Add("x-functions-key", functionKey);
+    }
+});
+
 builder.Services.AddMassTransit(busConfigurator =>
 {
     busConfigurator.AddConsumers(typeof(Program).Assembly);

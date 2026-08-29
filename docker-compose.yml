@@ -51,6 +51,9 @@ services:
       RabbitMq__VirtualHost: "/"
       RabbitMq__UserName: fiapgames-admin
       RabbitMq__Password: FiapGames@Admin123
+      Notifications__BaseUrl: "https://fiap-games-notification-hdaza0g6fudjc3ak.westus3-01.azurewebsites.net"
+      # Chave da Function: definida em um arquivo .env local, fora do versionamento.
+      Notifications__FunctionKey: "${NOTIFICATIONS_FUNCTION_KEY}"
 
 volumes:
   rabbitmq-data:
