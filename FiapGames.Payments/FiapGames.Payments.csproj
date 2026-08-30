@@ -15,6 +15,7 @@
         </PackageReference>
         <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.10"/>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9"/>
+        <PackageReference Include="NewRelic.Agent" Version="10.53.1"/>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.2"/>
     </ItemGroup>
