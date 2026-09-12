@@ -8,3 +8,7 @@ metadata:
 data:
   RabbitMq__Host: "rabbitmq.fiapgames.svc.cluster.local"
   RabbitMq__VirtualHost: "/"
+  # Só o e-mail de confirmação de compra virou serverless (Azure Function); o
+  # RabbitMq acima continua sendo usado para o Catalog aprovar o pedido e
+  # liberar o jogo na biblioteca. A chave fica no Secret, nunca aqui.
+  Notifications__BaseUrl: "https://fiap-games-notification-hdaza0g6fudjc3ak.westus3-01.azurewebsites.net"
