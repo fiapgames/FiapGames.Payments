@@ -1,5 +1,4 @@
 using FiapGames.Contracts.IntegrationEvents;
-using FiapGames.Payments.Infrastructure.Notifications;
 using FiapGames.Payments.Services;
 using MassTransit;
 
