@@ -1,0 +1,92 @@
+# Build e teste em todo push/PR; imagem no ECR e rolling update no EKS só na main.
+# Simulação local dos mesmos passos: FiapGames.Orchestration/ci/simulate-pipeline.sh payments-api
+name: deploy-prod
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  IMAGE_NAME: fiapgames/payments-api
+  # Imagem escrita em k8s/deployment.yaml; o deploy troca pela do ECR.
+  MANIFEST_IMAGE: lucasceifador/fiapgames-payments-api:latest
+  TRIVY_IMAGE: aquasec/trivy:0.75.0
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet test FiapGames.Payments.sln -c Release
+
+  image-deploy:
+    needs: build-test
+    runs-on: ubuntu-latest
+    env:
+      # Sem a AWS configurada o deploy é pulado, e a main continua verde.
+      DEPLOY: ${{ github.event_name == 'push' && vars.AWS_ROLE_ARN != '' }}
+    permissions:
+      contents: read
+      id-token: write
+    concurrency:
+      group: deploy-payments-${{ github.ref }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Tag da imagem
+        run: echo "TAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+
+      - name: Containerização
+        run: docker build -t "$IMAGE_NAME:$TAG" .
+
+      - name: Security scan (Trivy, só relatório)
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock "$TRIVY_IMAGE" \
+            image --no-progress --severity HIGH,CRITICAL --ignore-unfixed "$IMAGE_NAME:$TAG"
+
+      - name: Deploy pulado
+        if: github.event_name == 'push' && env.DEPLOY != 'true'
+        run: |
+          echo "::notice::Deploy pulado: configure as variáveis AWS_ROLE_ARN e AWS_REGION para publicar no EKS."
+
+      - name: Credenciais da AWS (OIDC, sem chave guardada)
+        if: env.DEPLOY == 'true'
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login no ECR
+        if: env.DEPLOY == 'true'
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Push
+        if: env.DEPLOY == 'true'
+        run: |
+          IMAGE="${{ steps.ecr.outputs.registry }}/$IMAGE_NAME:$TAG"
+          docker tag "$IMAGE_NAME:$TAG" "$IMAGE"
+          docker push "$IMAGE"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+      - name: Script de deploy compartilhado
+        if: env.DEPLOY == 'true'
+        uses: actions/checkout@v7
+        with:
+          repository: fiapgames/FiapGames.Orchestration
+          ref: main
+          path: orchestration
+
+      - name: Deploy no EKS (rolling update)
+        if: env.DEPLOY == 'true'
+        run: |
+          aws eks update-kubeconfig --name "${{ vars.EKS_CLUSTER || 'fiapgames' }}"
+          orchestration/ci/deploy.sh k8s "$MANIFEST_IMAGE" "$IMAGE"
