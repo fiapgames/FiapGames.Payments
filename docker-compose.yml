@@ -4,7 +4,7 @@ services:
     container_name: fiapgames-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: fiapgames-admin
-      RABBITMQ_DEFAULT_PASS: FiapGames@Admin123
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASSWORD:?defina no .env (veja .env.example)}"
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -21,7 +21,7 @@ services:
     container_name: fiapgames-payments-postgres
     environment:
       POSTGRES_USER: fiapgames-admin
-      POSTGRES_PASSWORD: FiapGames@Admin123
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?defina no .env (veja .env.example)}"
       POSTGRES_DB: fiapgames-payments
     ports:
       - "5432:5432"
@@ -46,11 +46,11 @@ services:
     ports:
       - "8080:8080"
     environment:
-      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=fiapgames-payments;Username=fiapgames-admin;Password=FiapGames@Admin123"
+      ConnectionStrings__Postgres: "Host=postgres;Port=5432;Database=fiapgames-payments;Username=fiapgames-admin;Password=${POSTGRES_PASSWORD}"
       RabbitMq__Host: rabbitmq
       RabbitMq__VirtualHost: "/"
       RabbitMq__UserName: fiapgames-admin
-      RabbitMq__Password: FiapGames@Admin123
+      RabbitMq__Password: "${RABBITMQ_PASSWORD}"
       Notifications__BaseUrl: "https://fiap-games-notification-hdaza0g6fudjc3ak.westus3-01.azurewebsites.net"
       # Chave da Function: definida em um arquivo .env local, fora do versionamento.
       Notifications__FunctionKey: "${NOTIFICATIONS_FUNCTION_KEY}"
