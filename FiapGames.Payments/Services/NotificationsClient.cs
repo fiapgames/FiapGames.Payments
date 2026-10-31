@@ -10,9 +10,10 @@ public interface INotificationsClient
 }
 
 /// <summary>
-/// Envia o evento de pagamento processado para a Azure Function de notificações,
-/// que virou serverless e não consome mais a fila. A publicação no RabbitMQ
-/// continua existindo porque o Catalog ainda consome esse mesmo evento.
+/// Envia o evento de pagamento processado para a Lambda de notificações (assinado
+/// com SigV4 pelo <see cref="SigV4Handler"/>), que virou serverless e não consome
+/// mais a fila. A publicação no RabbitMQ continua existindo porque o Catalog
+/// ainda consome esse mesmo evento.
 /// </summary>
 public class NotificationsClient(HttpClient httpClient, ILogger<NotificationsClient> logger)
     : INotificationsClient

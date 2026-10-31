@@ -1,3 +1,11 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: payments-api
+  namespace: fiapgames
+  labels:
+    app: payments-api
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,6 +23,9 @@ spec:
       labels:
         app: payments-api
     spec:
+      # A associação do EKS Pod Identity liga esta ServiceAccount à role que pode
+      # invocar a Lambda de notificações (infra/cloudformation/03-eks.yaml).
+      serviceAccountName: payments-api
       initContainers:
         - name: wait-for-postgres
           image: busybox:1.36

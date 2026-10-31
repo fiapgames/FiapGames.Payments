@@ -8,7 +8,9 @@ metadata:
 data:
   RabbitMq__Host: "rabbitmq.fiapgames.svc.cluster.local"
   RabbitMq__VirtualHost: "/"
-  # Só o e-mail de confirmação de compra virou serverless (Azure Function); o
+  # Só o e-mail de confirmação de compra virou serverless (AWS Lambda); o
   # RabbitMq acima continua sendo usado para o Catalog aprovar o pedido e
-  # liberar o jogo na biblioteca. A chave fica no Secret, nunca aqui.
-  Notifications__BaseUrl: "https://fiap-games-notification-hdaza0g6fudjc3ak.westus3-01.azurewebsites.net"
+  # liberar o jogo na biblioteca. Sem chave: a chamada é assinada com SigV4 usando
+  # a role do EKS Pod Identity da ServiceAccount payments-api.
+  Notifications__BaseUrl: "https://dhub5lvsgs42guupyqqelif2c40kjocc.lambda-url.us-east-2.on.aws"
+  Notifications__Region: "us-east-2"

@@ -51,9 +51,11 @@ services:
       RabbitMq__VirtualHost: "/"
       RabbitMq__UserName: fiapgames-admin
       RabbitMq__Password: "${RABBITMQ_PASSWORD}"
-      Notifications__BaseUrl: "https://fiap-games-notification-hdaza0g6fudjc3ak.westus3-01.azurewebsites.net"
-      # Chave da Function: definida em um arquivo .env local, fora do versionamento.
-      Notifications__FunctionKey: "${NOTIFICATIONS_FUNCTION_KEY}"
+      Notifications__BaseUrl: "${NOTIFICATIONS_BASE_URL}"
+      Notifications__Region: "${AWS_REGION:-us-east-2}"
+      # Credenciais para assinar (SigV4) a chamada à Lambda: definidas no .env local.
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
 
 volumes:
   rabbitmq-data:

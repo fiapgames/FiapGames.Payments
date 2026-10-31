@@ -14,18 +14,14 @@ builder.Services.AddDbContext<PaymentsDbContext>(options =>
 
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 
-// Notificações agora são servidas pela Azure Function serverless, via HTTP.
+// Notificações são servidas pela AWS Lambda (Function URL com AWS_IAM), via HTTP
+// assinado com SigV4.
+builder.Services.AddTransient<SigV4Handler>();
 builder.Services.AddHttpClient<INotificationsClient, NotificationsClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Notifications:BaseUrl"]!.TrimEnd('/') + "/");
     client.Timeout = TimeSpan.FromSeconds(10);
-
-    var functionKey = builder.Configuration["Notifications:FunctionKey"];
-    if (!string.IsNullOrWhiteSpace(functionKey))
-    {
-        client.DefaultRequestHeaders.Add("x-functions-key", functionKey);
-    }
-});
+}).AddHttpMessageHandler<SigV4Handler>();
 
 builder.Services.AddMassTransit(busConfigurator =>
 {
